@@ -1,0 +1,178 @@
+<!--
+  @description       : 
+  @author            : Ankit Majee
+  @group             : 
+  @last modified on  : 07-24-2025
+  @last modified by  : Ankit Majee
+-->
+<apex:page standardController="Candidate__c" extensions="CandidateResumeGeneratorController">
+    <apex:form >
+        <apex:commandButton action="{!generateResumePDFAsAttachment}" value="Generate Resume PDF (Attachment)" rerender="msgs"/>
+        <apex:pageMessages id="msgs"/>
+    </apex:form>
+    <head>
+        <style>
+            body { 
+                font-family: 'Arial', sans-serif; 
+                margin: 0.5in; 
+                padding: 0; 
+                border: 1px solid #ddd; /* Outer border around the whole resume */
+            }
+            .container {
+                padding: 20px;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 3px solid #FF4500; /* Underline for the header section */
+                padding-bottom: 10px;
+            }
+            .header h1 {
+                margin: 0;
+                color: #333;
+                font-size: 28px;
+                font-weight: bold;
+            }
+            .header .logo {
+                width: 80px; /* Adjust logo size */
+                height: auto;
+            }
+            .contact-info {
+                color: #777;
+                font-size: 14px;
+            }
+            .contact-info div {
+                margin-bottom: 5px;
+            }
+            .section {
+                margin-top: 20px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #FF4500;
+            }
+            .section-title {
+                font-size: 18px;
+                font-weight: bold;
+                color: #FF4500;
+            }
+            .main-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            .main-table td {
+                padding: 5px;
+            }
+            .main-table td b {
+                font-weight: bold;
+            }
+            .skills-table td {
+                padding-top: 10px;
+            }
+            .skills-table td p {
+                margin: 0;
+                font-size: 14px;
+                color: #555;
+            }
+            .additional-info-table td {
+                font-size: 14px;
+                color: #555;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="container">
+            <!-- Header Section with Logo and Candidate Info -->
+            <div class="header">
+                <img src="company_logo_url_here" alt="Company Logo" class="logo" />
+                <div>
+                    <h1>{!Candidate__c.First_Name__c} {!Candidate__c.Last_Name__c}</h1>
+                    <div class="contact-info">
+                        <apex:outputText rendered="{!NOT(ISBLANK(Candidate__c.Email__c))}" 
+                                         value="Email: {!Candidate__c.Email__c}" /><br/>
+                        <apex:outputText rendered="{!NOT(ISBLANK(Candidate__c.Phone__c))}" 
+                                         value="Phone: {!Candidate__c.Phone__c}" /><br/>
+                        <apex:outputText rendered="{!NOT(ISBLANK(Candidate__c.Status__c))}" 
+                                         value="Location: {!Candidate__c.Status__c}" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Education Section -->
+            <div class="section">
+                <div class="section-title">Education</div>
+                <table class="main-table">
+                    <tr>
+                        <td width="70%">
+                            <b>{!Candidate__c.Degree__c}</b><br/>
+                            {!Candidate__c.Institute_Name__c}
+                        </td>
+                        <td width="30%" style="text-align:right;">
+                            <b>
+                                <apex:outputText rendered="{!NOT(ISBLANK(Candidate__c.Graduation_Date__c))}" 
+                                                 value="{0, date, yyyy}">
+                                    <apex:param value="{!Candidate__c.Graduation_Date__c}" />
+                                </apex:outputText>
+                            </b>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Work Experience Section -->
+            <div class="section">
+                <div class="section-title">Work Experience</div>
+                <table class="main-table">
+                    <tr>
+                        <td width="70%">
+                            <b>{!Candidate__c.Work_Role__c}</b>
+                        </td>
+                        <td width="30%" style="text-align:right;">
+                            <b>
+                                <apex:outputText rendered="{!NOT(ISBLANK(Candidate__c.Date_From__c))}" 
+                                                 value="{0, date, MMM yyyy}">
+                                    <apex:param value="{!Candidate__c.Date_From__c}" />
+                                </apex:outputText>
+                                -
+                                <apex:outputText rendered="{!NOT(ISBLANK(Candidate__c.Date_Till__c))}" 
+                                                 value="{0, date, MMM yyyy}">
+                                    <apex:param value="{!Candidate__c.Date_Till__c}" />
+                                </apex:outputText>
+                            </b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <apex:outputText value="{!Candidate__c.Work_Description__c}" escape="false"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Skills and Certifications Section -->
+            <div class="section">
+                <div class="section-title">Skills and Certifications</div>
+                <table class="skills-table">
+                    <tr>
+                        <td>
+                            <p>{!Candidate__c.Skills_and_Certification__c}</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Additional Information Section -->
+            <div class="section">
+                <div class="section-title">Additional Information</div>
+                <table class="additional-info-table">
+                    <tr>
+                        <td>
+                            <apex:outputText value="{!Candidate__c.Any_other_Relevant_Information__c}" escape="false"/>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</apex:page>

@@ -1,0 +1,39 @@
+<!--
+  @description       : 
+  @author            : Ankit Majee
+  @group             : 
+  @last modified on  : 08-04-2025
+  @last modified by  : Ankit Majee
+-->
+<template>
+    <lightning-card title="Active Job Postings">
+        <div class="slds-p-around_medium">
+            <lightning-combobox 
+                name="departmentFilter" 
+                label="Filter by Department" 
+                value={selectedDepartment} 
+                options={departmentOptions} 
+                onchange={handleDepartmentChange}>
+            </lightning-combobox>
+
+            <lightning-datatable
+                key-field="id"
+                data={displayedJobPostings}
+                columns={columns}
+                onsort={handleSort}
+                sorted-by={sortBy}
+                sorted-direction={sortDirection}
+                hide-checkbox-column>
+            </lightning-datatable>
+
+            <template if:true={showMoreButtonVisible}>
+                <div class="slds-m-top_medium">
+                    <lightning-button 
+                        label="Show More" 
+                        onclick={handleShowMore}>
+                    </lightning-button>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Send Email to Candidate In Position Look Up</description>
+        <name>Send_Email_to_Candidate</name>
+        <label>Send Email to Candidate</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Map_the_email_to_respective_candidate_email</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>Fetching_All_job_Application_Ids.Candidate__r.Email__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>composeEmailContent</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Important updates on your Position</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>&lt;p&gt;Hi,&lt;/p&gt;&lt;p&gt;Your Position Record got updated have a Look&lt;/p&gt;&lt;p&gt;{!$Record.UpdatedField__c}{!$Record.UpdateAt__c}&lt;/p&gt;&lt;p&gt;{!$Record.Updated_By__c}&lt;/p&gt;</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>1.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Email_to_Related_Candidates</name>
+        <label>Send Email to Related Candidates</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Get_Related_Job_Applicants</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>Get_Related_Job_Applicants.Candidate__r.Email__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>composeEmailContent</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Send Position Update Email</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>&lt;p&gt;Hi,&lt;/p&gt;&lt;p&gt;Your Position Record got updated have a Look&lt;/p&gt;&lt;p&gt;{!$Record.UpdatedField__c}{!$Record.UpdateAt__c}&lt;/p&gt;&lt;p&gt;{!$Record.Updated_By__c}&lt;/p&gt;</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>1.0.1</versionString>
+    </actionCalls>
+    <apiVersion>64.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Assigning a Variable the Candidate Record ID</description>
+        <name>Create_Job_Application_ID</name>
+        <label>Create Job Application ID</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>JobApplicationId</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Fetching_All_job_Application_Ids.Candidate__r.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Fetching_All_job_Application_Ids</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>This event check if the Job Application we are getting is not null</description>
+        <name>Check_Not_Null</name>
+        <label>Check Not Null</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Null_Checked</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Record_from_Job_Application</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_the_Candidate</targetReference>
+            </connector>
+            <label>Null Checked</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Dont_go_forward</name>
+        <label>Dont go forward</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>not_ahead</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Send_Email_to_Candidate</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Fetching_All_job_Application_Ids</targetReference>
+            </connector>
+            <label>not ahead</label>
+        </rules>
+    </decisions>
+    <description>When Position gets updated it start a trigger and Send job notification to Candidates</description>
+    <environments>Default</environments>
+    <interviewLabel>Platform Event: Send job notification to Candidates {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Platform Event: Send job notification to Candidates</label>
+    <loops>
+        <description>This loops helps to Fetch All job Application Ids</description>
+        <name>Fetching_All_job_Application_Ids</name>
+        <label>Fetching All job Application Ids</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Record_from_Job_Application</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Create_Job_Application_ID</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Check_Not_Null</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>This loops helps to Fetch All job Application Ids</description>
+        <name>Get_Related_Job_Applicants</name>
+        <label>Get Related Job Applicants</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Record_from_Job_Application</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Send_Email_to_Related_Candidates</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Dont_go_forward</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <loops>
+        <description>Map the email to respective candidate email that are in the records of position lookup</description>
+        <name>Map_the_email_to_respective_candidate_email</name>
+        <label>Map the email to respective candidate email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_the_Candidate</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Send_Email_to_Candidate</targetReference>
+        </nextValueConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>This field gets the records form the Job Application</description>
+        <name>Get_Record_from_Job_Application</name>
+        <label>Get Record from Job Application</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_Related_Job_Applicants</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Position__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Position__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Job_Application__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Here we get the candidate from the application</description>
+        <name>Get_the_Candidate</name>
+        <label>Get the Candidate</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Map_the_email_to_respective_candidate_email</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>JobApplicationId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Job_Application__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Record_from_Job_Application</targetReference>
+        </connector>
+        <flowRunAsUser>TriggeringUser</flowRunAsUser>
+        <object>Send_notification_on_position_update__e</object>
+        <triggerType>PlatformEvent</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>JobApplicationId</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

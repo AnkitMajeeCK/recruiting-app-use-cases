@@ -1,0 +1,13 @@
+<!--
+  @description       : 
+  @author            : Ankit Majee
+  @group             : 
+  @last modified on  : 07-24-2025
+  @last modified by  : Ankit Majee
+-->
+<apex:page standardController="Candidate__c" recordSetVar="candidates" extensions="CandidateResumeBulkController">
+    <apex:form>
+        <apex:commandButton value="Generate Resumes (PDF Attachments)" action="{!generateBulkResumes}" rerender="msgs"/>
+        <apex:pageMessages id="msgs"/>
+    </apex:form>
+</apex:page>
