@@ -3,7 +3,7 @@
  *                      Can be used in both Visualforce and backend logic to trigger PDF generation.
  * @author            : Ankit Majee
  * @group             : Recruitment
- * @last modified on  : 08-10-2025
+ * @last modified on  : 08-11-2025
  * @last modified by  : Ankit Majee
 **/
 public with sharing class CandidateResumeGeneratorController {
